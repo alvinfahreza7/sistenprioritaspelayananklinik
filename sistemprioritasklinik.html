@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Prioritas Pelayanan Klinik</title>
+<style>
+:root{--navy:#17324d;--blue:#2563eb;--teal:#0f766e;--bg:#f3f6fb;--text:#1f2937;--muted:#64748b;--line:#e2e8f0}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:9px;padding:11px 14px;font-weight:700}
+.topbar{background:linear-gradient(120deg,#17324d,#2563eb);color:white;padding:22px 18px}.topinner{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-size:20px;font-weight:800}.brand small{display:block;font-size:12px;font-weight:400;color:#dbeafe;margin-top:5px}
+main{max-width:1100px;margin:26px auto;padding:0 16px}.auth-wrap{max-width:440px;margin:36px auto}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 5px 20px #0f172a0a}.auth-wrap h1{margin:0 0 8px;color:var(--navy);font-size:25px}.muted{color:var(--muted);font-size:14px;line-height:1.5}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f1f5f9;padding:5px;border-radius:10px;margin:20px 0}.tab{background:transparent;color:#475569}.tab.active{background:white;color:var(--blue);box-shadow:0 1px 4px #0f172a18}
+label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;background:white}input:focus,select:focus{outline:2px solid #bfdbfe;border-color:var(--blue)}.primary{background:var(--blue);color:white}.primary:hover{background:#1d4ed8}.full{width:100%;margin-top:18px}.secondary{background:#e2e8f0;color:#334155}.danger{background:#fee2e2;color:#991b1b}.success{background:#dcfce7;color:#166534}.notice{padding:12px;border-radius:9px;background:#eff6ff;color:#1e40af;font-size:12px;line-height:1.5;margin-top:15px}.demo{font-size:12px;color:var(--muted);line-height:1.7;margin-top:15px;border-top:1px solid var(--line);padding-top:12px}
+.hidden{display:none!important}.welcome{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}.welcome h1{margin:0;color:var(--navy);font-size:25px}.welcome p{margin:7px 0 0;color:var(--muted);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:18px}.stat{background:white;border:1px solid var(--line);border-radius:13px;padding:17px}.stat span{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}.stat strong{font-size:27px;color:var(--navy)}
+.grid{display:grid;grid-template-columns:330px 1fr;gap:18px;align-items:start}.card h2{margin:0 0 15px;font-size:18px;color:var(--navy)}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{flex:1;min-width:150px}.toolbar select{width:auto;min-width:140px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:620px}th,td{padding:12px 9px;text-align:left;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}th{background:#f8fafc;color:var(--muted);font-size:12px}.badge{display:inline-block;padding:5px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}.urgent{background:#fee2e2;color:#991b1b}.medium{background:#fef3c7;color:#92400e}.regular{background:#dcfce7;color:#166534}.waiting{background:#dbeafe;color:#1d4ed8}.serving{background:#ede9fe;color:#6d28d9}.finished{background:#e2e8f0;color:#475569}.empty{text-align:center;color:var(--muted);padding:25px;font-size:14px}.queue-ticket{border:1px dashed #93c5fd;background:#eff6ff;border-radius:12px;padding:16px;margin-top:15px}.ticket-no{font-size:30px;font-weight:800;color:var(--blue);margin:6px 0}.ticket-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.ticket-row:last-child{border-bottom:0}.actions{display:flex;gap:5px;flex-wrap:wrap}.smallbtn{padding:8px 10px;font-size:12px}.footer-note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:14px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}@media(max-width:520px){.stats{grid-template-columns:1fr}.topinner{align-items:flex-start;flex-direction:column}.card{padding:17px}.welcome h1{font-size:22px}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topinner"><div class="brand">🏥 KlinikCare <small>Sistem Prioritas Pelayanan Klinik</small></div><div id="topRight"></div></div></header>
+<main>
+<section id="authView" class="auth-wrap">
+  <div class="card">
+    <h1 id="authTitle">Masuk ke KlinikCare</h1>
+    <p class="muted" id="authSubtitle">Pilih jenis akun untuk melanjutkan.</p>
+    <div class="tabs"><button class="tab active" id="patientTab" type="button">Akun Pasien</button><button class="tab" id="adminTab" type="button">Admin Klinik</button></div>
+    <form id="loginForm">
+      <div id="nameField" class="hidden"><label for="fullName">Nama lengkap</label><input id="fullName" maxlength="70" placeholder="Nama sesuai identitas"></div>
+      <label for="username" id="usernameLabel">Username</label><input id="username" required autocomplete="username" placeholder="Masukkan username">
+      <label for="password">Password</label><input id="password" type="password" required autocomplete="current-password" placeholder="Masukkan password">
+      <button class="primary full" id="authSubmit" type="submit">Masuk sebagai Pasien</button>
+    </form>
+    <p class="muted" id="switchAuth" style="text-align:center;margin:17px 0 0">Belum punya akun pasien? <a href="#" id="switchLink">Daftar di sini</a></p>
+</section>
+
+<section id="patientView" class="hidden">
+  <div class="welcome"><div><h1>Dashboard Pasien</h1><p id="patientGreeting">Selamat datang.</p></div><button class="secondary" id="patientLogout">Keluar</button></div>
+  <div class="grid">
+    <section class="card">
+      <h2>Ambil Antrean Klinik</h2>
+      <p class="muted">Isi keluhan untuk mengajukan antrean pelayanan.</p>
+      <form id="queueForm">
+        <label for="patientComplaint">Keluhan utama</label><input id="patientComplaint" required maxlength="120" placeholder="Contoh: demam, batuk">
+        <label for="patientService">Jenis layanan</label><select id="patientService"><option>Pemeriksaan umum</option><option>Konsultasi dokter</option><option>Pemeriksaan lanjutan</option><option>Kontrol ulang</option></select>
+        <button class="primary full" type="submit">Ambil Nomor Antrean</button>
+      </form>
+      <div id="myTicket" class="queue-ticket hidden"></div>
+    </section>
+    <section class="card">
+      <h2>Status Antrean Saya</h2>
+      <div id="myQueue"></div>
+    </section>
+  </div>
+</section>
+
+<section id="adminView" class="hidden">
+  <div class="welcome"><div><h1>Dashboard Admin Klinik</h1><p>Kelola antrean dan status pelayanan pasien.</p></div><button class="secondary" id="adminLogout">Keluar</button></div>
+  <div class="stats">
+    <div class="stat"><span>Total antrean</span><strong id="totalCount">0</strong></div>
+    <div class="stat"><span>Menunggu</span><strong id="waitingCount">0</strong></div>
+    <div class="stat"><span>Sedang dilayani</span><strong id="servingCount">0</strong></div>
+  </div>
+  <section class="card">
+    <h2>Manajemen Antrean Pasien</h2>
+    <div class="toolbar"><input id="adminSearch" placeholder="Cari nomor atau nama pasien..." aria-label="Cari pasien"><select id="adminFilter"><option value="all">Semua status</option><option value="waiting">Menunggu</option><option value="serving">Sedang dilayani</option><option value="finished">Selesai</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Nomor</th><th>Pasien</th><th>Layanan / Keluhan</th><th>Status</th><th>Waktu</th><th>Aksi</th></tr></thead><tbody id="adminRows"></tbody></table><div id="adminEmpty" class="empty">Belum ada antrean pasien.</div></div>
+  </section>
+</section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = 'klinikcare_demo_v1';
+let users = [];
+let queue = [];
+let currentUser = null;
+let authRole = 'patient';
+let isRegister = false;
+let nextQueue = 1;
+function loadData(){
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    users = Array.isArray(data.users) ? data.users : [];
+    queue = Array.isArray(data.queue) ? data.queue : [];
+    nextQueue = Number(data.nextQueue) || (queue.length + 1);
+  } catch(e) { users=[]; queue=[]; nextQueue=1; }
+  if (!users.some(u => u.username === 'admin')) users.push({name:'Admin Klinik',username:'admin',password:'admin123',role:'admin'});
+}
+function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({users,queue,nextQueue})); }
+function safe(s){return String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function setAuthRole(role){
+  authRole=role; isRegister=false;
+  $('patientTab').classList.toggle('active',role==='patient');
+  $('adminTab').classList.toggle('active',role==='admin');
+  updateAuthUI();
+}
+function updateAuthUI(){
+  $('authTitle').textContent=isRegister?'Daftar Akun Pasien':'Masuk ke KlinikCare';
+  $('authSubtitle').textContent=authRole==='admin'?'Masuk khusus petugas pengelola klinik.':'Masuk untuk mengambil dan memantau antrean.';
+  $('nameField').classList.toggle('hidden',!(authRole==='patient'&&isRegister));
+  $('usernameLabel').textContent='Username';
+  $('username').placeholder='Masukkan username';
+  $('password').autocomplete=isRegister?'new-password':'current-password';
+  $('authSubmit').textContent=isRegister?'Buat Akun Pasien':(authRole==='admin'?'Masuk sebagai Admin':'Masuk sebagai Pasien');
+  $('switchAuth').classList.toggle('hidden',authRole==='admin');
+  $('switchAuth').innerHTML=isRegister?'Sudah punya akun? <a href="#" id="switchLink">Masuk di sini</a>':'Belum punya akun pasien? <a href="#" id="switchLink">Daftar di sini</a>';
+  $('switchLink').addEventListener('click',e=>{e.preventDefault();isRegister=!isRegister;updateAuthUI();});
+}
+function showView(view){
+  ['authView','patientView','adminView'].forEach(id=>$(id).classList.add('hidden'));
+  $(view).classList.remove('hidden');
+  $('topRight').innerHTML=currentUser?`<span style="font-size:13px">👤 ${safe(currentUser.name)} · ${currentUser.role==='admin'?'Admin':'Pasien'}</span>`:'';
+}
+$('patientTab').addEventListener('click',()=>setAuthRole('patient'));
+$('adminTab').addEventListener('click',()=>setAuthRole('admin'));
+$('loginForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const username=$('username').value.trim().toLowerCase(), password=$('password').value;
+  if(authRole==='admin'){
+    const user=users.find(u=>u.username===username&&u.password===password&&u.role==='admin');
+    if(!user){alert('Username atau password admin salah.');return;}
+    currentUser=user;showView('adminView');renderAdmin();return;
+  }
+  if(isRegister){
+    const name=$('fullName').value.trim();
+    if(!name){alert('Masukkan nama lengkap.');return;}
+    if(username.length<3){alert('Username minimal 3 karakter.');return;}
+    if(password.length<4){alert('Password minimal 4 karakter untuk demo ini.');return;}
+    if(users.some(u=>u.username===username)){alert('Username sudah digunakan.');return;}
+    const user={name,username,password,role:'patient'};
+    users.push(user);saveData();currentUser=user;showPatient();return;
+  }
+  const user=users.find(u=>u.username===username&&u.password===password&&u.role==='patient');
+  if(!user){alert('Akun tidak ditemukan. Silakan daftar terlebih dahulu.');return;}
+  currentUser=user;showPatient();
+});
+function showPatient(){
+  showView('patientView');$('patientGreeting').textContent=`Selamat datang, ${currentUser.name}.`;
+  renderPatient();
+}
+$('queueForm').addEventListener('submit',e=>{
+  e.preventDefault();if(!currentUser||currentUser.role!=='patient')return;
+  const existing=queue.find(q=>q.username===currentUser.username&&q.status!=='finished');
+  if(existing){alert('Anda masih memiliki antrean yang belum selesai. Pantau status antrean Anda terlebih dahulu.');return;}
+  const q={id:Date.now()+Math.random(),number:'K-'+String(nextQueue++).padStart(3,'0'),username:currentUser.username,name:currentUser.name,complaint:$('patientComplaint').value.trim(),service:$('patientService').value,status:'waiting',created:new Date().toISOString()};
+  queue.push(q);saveData();$('queueForm').reset();renderPatient();alert('Nomor antrean berhasil dibuat: '+q.number);
+});
+function statusBadge(status){const m={waiting:['Menunggu','waiting'],serving:['Sedang dilayani','serving'],finished:['Selesai','finished']};const a=m[status]||m.waiting;return `<span class="badge ${a[1]}">${a[0]}</span>`;}
+function renderPatient(){
+ const mine=queue.filter(q=>q.username===currentUser.username).sort((a,b)=>new Date(b.created)-new Date(a.created));
+ const active=mine.find(q=>q.status!=='finished');
+ $('myTicket').classList.toggle('hidden',!active);
+ if(active){$('myTicket').innerHTML=`<div class="muted">Nomor antrean aktif Anda</div><div class="ticket-no">${safe(active.number)}</div>${statusBadge(active.status)}<p class="muted">${safe(active.service)} · ${safe(active.complaint)}</p>`;}
+ const target=$('myQueue');
+ if(!mine.length){target.innerHTML='<div class="empty">Anda belum mengambil antrean.</div>';return;}
+ target.innerHTML=mine.map(q=>`<div class="ticket-row"><div><strong>${safe(q.number)} · ${safe(q.service)}</strong><br><span class="muted">${safe(q.complaint)}</span><br><span class="muted">${new Date(q.created).toLocaleString('id-ID')}</span></div><div>${statusBadge(q.status)}</div></div>`).join('');
+}
+function renderAdmin(){
+ const query=$('adminSearch').value.toLowerCase().trim(),filter=$('adminFilter').value;
+ const list=[...queue].sort((a,b)=>new Date(a.created)-new Date(b.created)).filter(q=>(filter==='all'||q.status===filter)&&(`${q.number} ${q.name} ${q.username} ${q.complaint}`.toLowerCase().includes(query)));
+ $('adminRows').innerHTML=list.map(q=>{
+ let actions='';
+ if(q.status==='waiting')actions=`<button class="primary smallbtn" data-act="serve" data-id="${q.id}">Panggil</button>`;
+ else if(q.status==='serving')actions=`<button class="success smallbtn" data-act="finish" data-id="${q.id}">Selesaikan</button>`;
+ if(q.status==='finished')actions=`<button class="danger smallbtn" data-act="delete" data-id="${q.id}">Hapus</button>`;
+ return `<tr><td><strong>${safe(q.number)}</strong></td><td>${safe(q.name)}<br><span class="muted">@${safe(q.username)}</span></td><td>${safe(q.service)}<br><span class="muted">${safe(q.complaint)}</span></td><td>${statusBadge(q.status)}</td><td>${new Date(q.created).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</td><td><div class="actions">${actions}</div></td></tr>`;
+ }).join('');
+ $('adminEmpty').style.display=list.length?'none':'block';
+ $('totalCount').textContent=queue.length;
+ $('waitingCount').textContent=queue.filter(q=>q.status==='waiting').length;
+ $('servingCount').textContent=queue.filter(q=>q.status==='serving').length;
+}
+$('adminRows').addEventListener('click',e=>{
+ const b=e.target.closest('button[data-act]');if(!b)return;
+ const q=queue.find(item=>String(item.id)===b.dataset.id);if(!q)return;
+ if(b.dataset.act==='serve'){
+  if(queue.some(item=>item.status==='serving')){alert('Selesaikan pasien yang sedang dilayani terlebih dahulu.');return;}
+  q.status='serving';
+ } else if(b.dataset.act==='finish')q.status='finished';
+ else if(b.dataset.act==='delete'){if(!confirm(`Hapus antrean ${q.number}?`))return;queue=queue.filter(item=>item.id!==q.id);}
+ saveData();renderAdmin();
+});
+$('adminSearch').addEventListener('input',renderAdmin);$('adminFilter').addEventListener('change',renderAdmin);
+function logout(){currentUser=null;$('loginForm').reset();setAuthRole('patient');showView('authView');}
+$('patientLogout').addEventListener('click',logout);$('adminLogout').addEventListener('click',logout);
+loadData();updateAuthUI();showView('authView');
+</script>
+</body>
+</html>
